@@ -1,0 +1,32 @@
+# Python venv and cache
+venv/
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE configs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Streamlit & FastAPI temporary files
+*.db
+*.sqlite3
+
+# ChromaDB vector database (auto-generated)
+backend/storage/vector_db/
+
+# Uploaded documents (auto-generated)
+backend/storage/uploaded_files/
+
+# This should stay because checkout.html must be committed
+!backend/storage/assets/
+!backend/storage/assets/checkout.html
