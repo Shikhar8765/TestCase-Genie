@@ -1,7 +1,18 @@
-import os
+import subprocess
+import threading
 
-# HF will run this file but Dockerfile will override runtime.
-# Still required so HuggingFace stops showing "No application file"
-print("🚀 TestCase-Genie backend/frontend launching via Dockerfile...")
+# --- Start FastAPI backend on port 7860 ---
+def run_backend():
+    subprocess.run(
+        ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "7860"]
+    )
 
-# This script does nothing, Dockerfile actually runs uvicorn + streamlit.
+# --- Start Streamlit frontend on port 7861 ---
+def run_frontend():
+    subprocess.run(
+        ["streamlit", "run", "frontend/app.py", "--server.port=7861", "--server.address=0.0.0.0"]
+    )
+
+# Run both in parallel
+threading.Thread(target=run_backend).start()
+threading.Thread(target=run_frontend).start()
