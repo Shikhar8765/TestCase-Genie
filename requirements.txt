@@ -13,3 +13,5 @@ numpy
 scikit-learn
 PyMuPDF
 langchain-text-splitters
+langchain-huggingface
+

@@ -3,22 +3,28 @@ import json
 import fitz  # PyMuPDF
 from bs4 import BeautifulSoup
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 import chromadb
+
 
 class DocumentIngestion:
 
     def __init__(self, vector_db_path="backend/storage/vector_db"):
+        # Initialize ChromaDB persistent storage
         self.client = chromadb.PersistentClient(path=vector_db_path)
         self.collection = self.client.get_or_create_collection(
             name="qa_knowledge_base",
             metadata={"hnsw:space": "cosine"}
         )
-        self.embedder = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-    # ----------------------------
-    # 1. PARSE PDF / TXT / MD FILES
-    # ----------------------------
+        # Using new package for HuggingFace embeddings
+        self.embedder = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
+
+    # -----------------------------------
+    # 1. PARSE PDF / TXT / MD / JSON FILES
+    # -----------------------------------
     def parse_document(self, file_path):
         ext = file_path.split(".")[-1].lower()
 
@@ -54,8 +60,8 @@ class DocumentIngestion:
             html = f.read()
 
         soup = BeautifulSoup(html, "html.parser")
-
         readable_text = soup.get_text(separator="\n")
+
         return readable_text, str(soup)
 
     # ----------------------------
@@ -76,11 +82,11 @@ class DocumentIngestion:
 
             if source_name.endswith(".html"):
                 raw_text, full_html = self.parse_html(file_path)
-
                 chunks = text_splitter.split_text(raw_text)
 
                 for i, chunk in enumerate(chunks):
                     embedding = self.embedder.embed_query(chunk)
+
                     self.collection.add(
                         ids=[f"{source_name}-{i}"],
                         documents=[chunk],
@@ -90,11 +96,11 @@ class DocumentIngestion:
 
             else:
                 raw_text = self.parse_document(file_path)
-
                 chunks = text_splitter.split_text(raw_text)
 
                 for i, chunk in enumerate(chunks):
                     embedding = self.embedder.embed_query(chunk)
+
                     self.collection.add(
                         ids=[f"{source_name}-{i}"],
                         documents=[chunk],
