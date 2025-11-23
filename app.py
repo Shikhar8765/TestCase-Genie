@@ -1,18 +1,28 @@
 import subprocess
 import threading
+import os
 
-# --- Start FastAPI backend on port 7860 ---
+PORT = os.environ.get("PORT", "10000")
+
 def run_backend():
-    subprocess.run(
-        ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "7860"]
-    )
+    subprocess.run([
+        "uvicorn", "backend.main:app",
+        "--host", "0.0.0.0",
+        "--port", PORT
+    ])
 
-# --- Start Streamlit frontend on port 7861 ---
 def run_frontend():
-    subprocess.run(
-        ["streamlit", "run", "frontend/app.py", "--server.port=7861", "--server.address=0.0.0.0"]
-    )
+    subprocess.run([
+        "streamlit", "run", "frontend/app.py",
+        "--server.port=" + PORT,
+        "--server.address=0.0.0.0"
+    ])
 
-# Run both in parallel
-threading.Thread(target=run_backend).start()
-threading.Thread(target=run_frontend).start()
+if __name__ == "__main__":
+    t1 = threading.Thread(target=run_backend)
+    t2 = threading.Thread(target=run_frontend)
+
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()

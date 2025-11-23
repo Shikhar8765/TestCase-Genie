@@ -1,26 +1,27 @@
-# ---- Base Image ----
 FROM python:3.10-slim
 
-# ---- Set Work Directory ----
 WORKDIR /app
 
-# ---- Install System Dependencies ----
+# Install dependencies required by Streamlit
 RUN apt-get update && apt-get install -y \
     build-essential \
-    chromium-driver \
-    chromium \
-    curl \
+    libglib2.0-0 \
+    libnss3 \
+    libgconf-2-4 \
+    libxi6 \
+    libxcursor1 \
+    libxdamage1 \
+    libxrandr2 \
+    libasound2 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
     && apt-get clean
 
-# ---- Copy Project Files ----
 COPY . /app
 
-# ---- Install Python Dependencies ----
 RUN pip install --no-cache-dir -r requirements.txt
 
-# ---- Expose Ports ----
-EXPOSE 7860
-EXPOSE 7861
+EXPOSE 10000
 
-# ---- Run Backend + Streamlit Together ----
-CMD ["bash", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port 7860 & streamlit run frontend/app.py --server.port 7861 --server.address 0.0.0.0"]
+CMD ["python", "app.py"]
