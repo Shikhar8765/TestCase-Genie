@@ -2,25 +2,18 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install dependencies required by Streamlit
+# Install minimal OS dependencies (Streamlit + FastAPI don't need chromium)
 RUN apt-get update && apt-get install -y \
     build-essential \
-    libglib2.0-0 \
-    libnss3 \
-    libgconf-2-4 \
-    libxi6 \
-    libxcursor1 \
-    libxdamage1 \
-    libxrandr2 \
-    libasound2 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
+    curl \
     && apt-get clean
 
 COPY . /app
 
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Render exposes PORT env automatically
+ENV PORT=10000
 
 EXPOSE 10000
 
