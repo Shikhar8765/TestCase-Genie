@@ -11,3 +11,5 @@ requests
 streamlit
 numpy
 scikit-learn
+PyMuPDF
+
