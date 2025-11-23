@@ -12,4 +12,4 @@ streamlit
 numpy
 scikit-learn
 PyMuPDF
-
+langchain-text-splitters
